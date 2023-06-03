@@ -1,10 +1,9 @@
 const HTTP_STATUS_CREATED = 201;
-const HTTP_STATUS_BAD_REQUEST = 400;
-const HTTP_STATUS_NOT_FOUND = 404;
 
 class NotesHandler {
-  constructor(service) {
+  constructor(service, validator) {
     this._service = service;
+    this._validator = validator;
 
     this.postNoteHandler = this.postNoteHandler.bind(this);
     this.getNotesHandler = this.getNotesHandler.bind(this);
@@ -15,17 +14,19 @@ class NotesHandler {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  handleError(h, error, statusCode = HTTP_STATUS_BAD_REQUEST) {
+  handleError(h, error) {
     const response = h.response({
       status: 'fail',
       message: error.message,
     });
-    response.code(statusCode);
+    response.code(error.statusCode);
     return response;
   }
 
   postNoteHandler(request, h) {
     try {
+      this._validator.validateNotePayload(request.payload);
+
       const { title = 'untitled', body, tags } = request.payload;
 
       const noteId = this._service.addNote({ title, body, tags });
@@ -40,7 +41,7 @@ class NotesHandler {
       response.code(HTTP_STATUS_CREATED);
       return response;
     } catch (error) {
-      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
+      return this.handleError(h, error);
     }
   }
 
@@ -67,12 +68,14 @@ class NotesHandler {
         },
       };
     } catch (error) {
-      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
+      return this.handleError(h, error);
     }
   }
 
   putNoteByIdHandler(request, h) {
     try {
+      this._validator.validateNotePayload(request.payload);
+
       const { id } = request.params;
 
       this._service.editNoteById(id, request.payload);
@@ -82,7 +85,7 @@ class NotesHandler {
         message: 'Catatan berhasil diperbarui',
       };
     } catch (error) {
-      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
+      return this.handleError(h, error);
     }
   }
 
@@ -95,7 +98,7 @@ class NotesHandler {
         message: 'Catatan berhasil dihapus',
       };
     } catch (error) {
-      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
+      return this.handleError(h, error);
     }
   }
 }
