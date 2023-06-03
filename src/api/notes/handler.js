@@ -1,10 +1,14 @@
+const HTTP_STATUS_CREATED = 201;
+const HTTP_STATUS_BAD_REQUEST = 400;
+const HTTP_STATUS_NOT_FOUND = 404;
+
 class NotesHandler {
   constructor(service) {
     this._service = service;
   }
 
   // eslint-disable-next-line class-methods-use-this
-  handleError(h, error, statusCode = 400) {
+  handleError(h, error, statusCode = HTTP_STATUS_BAD_REQUEST) {
     const response = h.response({
       status: 'fail',
       message: error.message,
@@ -26,10 +30,10 @@ class NotesHandler {
           noteId,
         },
       });
-      response.code(201);
+      response.code(HTTP_STATUS_CREATED);
       return response;
     } catch (error) {
-      return this.handleError(h, error, 404);
+      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
     }
   }
 
@@ -56,7 +60,7 @@ class NotesHandler {
         },
       };
     } catch (error) {
-      return this.handleError(h, error, 404);
+      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
     }
   }
 
@@ -71,7 +75,7 @@ class NotesHandler {
         message: 'Catatan berhasil diperbarui',
       };
     } catch (error) {
-      return this.handleError(h, error, 404);
+      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
     }
   }
 
@@ -84,7 +88,7 @@ class NotesHandler {
         message: 'Catatan berhasil dihapus',
       };
     } catch (error) {
-      return this.handleError(h, error, 404);
+      return this.handleError(h, error, HTTP_STATUS_NOT_FOUND);
     }
   }
 }
