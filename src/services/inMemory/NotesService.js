@@ -1,5 +1,4 @@
 const { nanoid } = require('nanoid');
-const notes = require('../../notes');
 
 class NotesService {
   constructor() {
@@ -39,7 +38,7 @@ class NotesService {
   }
 
   editNoteById(id, { title, body, tags }) {
-    const index = notes.findIndex((note) => note.id === id);
+    const index = this._notes.findIndex((note) => note.id === id);
     if (index === -1) {
       throw new Error('Gagal memperbarui catatan. Id tidak ditemukan');
     }
@@ -56,7 +55,7 @@ class NotesService {
   }
 
   deleteNoteById(id) {
-    const index = notes.findIndex((note) => note.id === id);
+    const index = this._notes.findIndex((note) => note.id === id);
 
     if (index === -1) {
       throw new Error('Catatan gagal dihapus. Id tidak ditemukan');
